@@ -95,7 +95,7 @@ function displayResultPage($imagePath, $shortUrls, $title)
     }
     $urlsHtml .= '</table>';
 
-    // HTML final
+    // HTML final corrigido para seguir seu design atual
     $html = <<<HTML
     <!DOCTYPE html>
     <html lang="pt-BR">
@@ -106,48 +106,6 @@ function displayResultPage($imagePath, $shortUrls, $title)
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-        <style>
-            .affiliate-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            .affiliate-table td {
-                padding: 10px;
-                border: 1px solid #ddd;
-            }
-            .tag-name {
-                font-weight: bold;
-                text-transform: capitalize;
-                width: 15%;
-            }
-            .affiliate-url {
-                width: 90%;
-                padding: 5px;
-                border: 1px solid #ccc;
-                border-radius: 5px;
-            }
-            .copy-button {
-                width: 40px;
-                height: 40px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .copy-button i {
-                font-size: 16px;
-            }
-
-            .result-image {
-                max-width: 50%;
-                margin-bottom: 20px;
-            }
-        </style>
     </head>
     <body>
         <div class="container">
@@ -156,7 +114,7 @@ function displayResultPage($imagePath, $shortUrls, $title)
                 <div class="affiliate-links">
                     {$urlsHtml}
                 </div>
-                <a href="index.php" class="button">Gerar Nova Capa</a>
+                <button onclick="window.location.href='index.php'" class="generate-new">Gerar Nova Capa</button>
             </div>
         </div>
         <script>
@@ -179,6 +137,9 @@ function displayResultPage($imagePath, $shortUrls, $title)
 
     echo $html;
 }
+
+
+
 
 
 function sanitizeFilename($filename)

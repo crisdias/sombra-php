@@ -9,10 +9,13 @@ html {
 
 .container {
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* Mantém tudo empilhado verticalmente */
+    justify-content: flex-start; /* Garante que a imagem fique no topo */
     align-items: center;
-    height: 100%;
+    height: auto; /* Permite que a altura aumente naturalmente */
+    padding: 20px;
 }
+
 
 .form-container {
     background-color: white;
@@ -64,9 +67,13 @@ button:hover {
 
 .result-image {
     max-width: 100%;
+    width: 100%;
     height: auto;
     margin-bottom: 20px;
+    display: block;
+    object-fit: contain; /* Garante que a imagem inteira apareça */
 }
+
 
 .affiliate-url-container {
     display: flex;
@@ -94,4 +101,65 @@ button:hover {
 
 .copy-button:hover {
     background-color: #0056b3;
+}
+
+.affiliate-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.affiliate-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.tag-name {
+    font-weight: bold;
+    text-transform: capitalize;
+    width: 25%;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.affiliate-url {
+    width: 80%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.copy-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.copy-button:hover {
+    background-color: #0056b3;
+}
+
+.generate-new {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    padding: 0 auto;
+    margin: 0 auto;
+    margin-top: 20px;
+    text-align: center;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.generate-new:hover {
+    background-color: #218838;
 }
