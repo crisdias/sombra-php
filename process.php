@@ -142,6 +142,11 @@ function displayResultPage($imagePath, $shortUrls, $title)
             .copy-button i {
                 font-size: 16px;
             }
+
+            .result-image {
+                max-width: 50%;
+                margin-bottom: 20px;
+            }
         </style>
     </head>
     <body>
