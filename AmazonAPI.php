@@ -10,8 +10,18 @@ class AmazonAPI
     private $region = 'us-east-1';
     private $service = 'ProductAdvertisingAPI';
 
-    public function getBookData($asin)
+    private function getTagFromName($tagName) {
+        $tags = json_decode(AWS_ASSOCIATE_TAGS, true);
+        return $tags[$tagName] ?? false;
+    }
+
+    public function getBookData($asin, $tagName = 'default')
     {
+        $tagId = $this->getTagFromName($tagName);
+        if (!$tagId) {
+            throw new Exception("Tag de associado não encontrada para o nome: " . $tagName);
+        }
+
         $payload = json_encode([
             'ItemIds' => [$asin],
             'PartnerTag' => AWS_ASSOCIATE_TAG,
@@ -106,10 +116,15 @@ class AmazonAPI
         return hash_hmac('sha256', 'aws4_request', $serviceKey, true);
     }
 
-    public function generateShortAffiliateUrl($asin)
+    public function generateShortAffiliateUrls($asin)
     {
-        $longUrl = "https://www.amazon.com.br/dp/{$asin}?tag=" . AWS_ASSOCIATE_TAG;
-        return $this->shortenUrl($longUrl);
+        $return = [];
+        foreach (json_decode(AWS_ASSOCIATE_TAGS, true) as $tagName => $tagId) {
+            $longUrl = "https://www.amazon.com.br/dp/{$asin}?tag={$tagId}";
+            $shortUrl = $this->shortenUrl($longUrl);
+            $return[$tagName] = $shortUrl;
+        }
+        return $return;
     }
 
     private function shortenUrl($longUrl)

@@ -40,10 +40,10 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GE
         $processedImagePath = $imageProcessor->processImage($coverImagePath);
 
         // Gerar URL curta com código de afiliado
-        $shortUrl = $amazonAPI->generateShortAffiliateUrl($asin);
+        $shortUrls = $amazonAPI->generateShortAffiliateUrls($asin);
 
         // Exibir a página de resultado
-        displayResultPage($processedImagePath, $shortUrl, $bookData['title']);
+        displayResultPage($processedImagePath, $shortUrls, $bookData['title']);
     } catch (Exception $e) {
         echo "Erro: " . $e->getMessage();
     }
@@ -76,9 +76,26 @@ function downloadCoverImage($imageUrl)
     return $tempImagePath;
 }
 
-function displayResultPage($imagePath, $shortUrl, $title)
+function displayResultPage($imagePath, $shortUrls, $title)
 {
     $imageUrl = 'img/' . basename($imagePath);
+
+    // Gerar HTML das URLs curtas dentro de uma tabela
+    $urlsHtml = '<table class="affiliate-table">';
+    foreach ($shortUrls as $tag => $url) {
+        $urlsHtml .= <<<HTML
+        <tr>
+            <td class="tag-name">{$tag}</td>
+            <td><input type="text" value="{$url}" id="affiliateUrl-{$tag}" class="affiliate-url" readonly></td>
+            <td><button onclick="copyToClipboard('affiliateUrl-{$tag}')" class="copy-button">
+                <i class="fas fa-clipboard"></i>
+            </button></td>
+        </tr>
+        HTML;
+    }
+    $urlsHtml .= '</table>';
+
+    // HTML final
     $html = <<<HTML
     <!DOCTYPE html>
     <html lang="pt-BR">
@@ -89,32 +106,65 @@ function displayResultPage($imagePath, $shortUrl, $title)
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+        <style>
+            .affiliate-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .affiliate-table td {
+                padding: 10px;
+                border: 1px solid #ddd;
+            }
+            .tag-name {
+                font-weight: bold;
+                text-transform: capitalize;
+                width: 15%;
+            }
+            .affiliate-url {
+                width: 90%;
+                padding: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            .copy-button {
+                width: 40px;
+                height: 40px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .copy-button i {
+                font-size: 16px;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
             <div class="result-container">
                 <img src="{$imageUrl}" alt="{$title}" class="result-image">
-                <div class="affiliate-url-container">
-                    <input type="text" value="{$shortUrl}" id="affiliateUrl" class="affiliate-url" readonly>
-                    <button onclick="copyToClipboard()" class="copy-button">
-                        <i class="fas fa-clipboard"></i>
-                    </button>
+                <div class="affiliate-links">
+                    {$urlsHtml}
                 </div>
                 <a href="index.php" class="button">Gerar Nova Capa</a>
             </div>
         </div>
         <script>
-        function copyToClipboard() {
-            var copyText = document.getElementById("affiliateUrl");
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             document.execCommand("copy");
 
-            var button = document.querySelector(".copy-button");
-            var icon = button.querySelector("i");
-            icon.className = "fas fa-check";
+            var button = copyText.closest("tr").querySelector(".copy-button i");
+            button.className = "fas fa-check";
             setTimeout(function() {
-                icon.className = "fas fa-clipboard";
+                button.className = "fas fa-clipboard";
             }, 2000);
         }
         </script>
@@ -124,6 +174,7 @@ function displayResultPage($imagePath, $shortUrl, $title)
 
     echo $html;
 }
+
 
 function sanitizeFilename($filename)
 {

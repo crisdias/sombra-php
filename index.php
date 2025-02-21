@@ -13,7 +13,7 @@
     <div class="container">
         <div class="form-container">
             <h1>Gerador de Capas</h1>
-            <form action="process.php" method="POST">
+            <form action="process.php" method="GET">
                 <input type="url" name="amazon_url" placeholder="Cole a URL da Amazon aqui" required>
                 <button type="submit">Gerar Capa</button>
             </form>
