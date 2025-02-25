@@ -3,8 +3,12 @@ require_once 'vendor/autoload.php';
 require_once 'config.php';
 require_once 'AmazonAPI.php';
 require_once 'ImageProcessor.php';
+require_once 'yourls.php';
 
 use GuzzleHttp\Client;
+$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
+$twig = new \Twig\Environment($loader);
+
 
 // Definir o diretório de imagens
 define('IMG_DIR', __DIR__ . '/img');
@@ -35,15 +39,21 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' || $_SERVER['REQUEST_METHOD'] === 'GE
 
         // Baixar a imagem da capa
         $coverImagePath = downloadCoverImage($bookData['image_url']);
+        $productTitle   = $bookData['title'];
 
         // Processar a imagem (adicionar sombra)
         $processedImagePath = $imageProcessor->processImage($coverImagePath);
 
         // Gerar URL curta com código de afiliado
-        $shortUrls = $amazonAPI->generateShortAffiliateUrls($asin);
+        $shortUrls  = $amazonAPI->generateShortAffiliateUrls($asin);
+        if (defined('YOURLS_API_URL')) {
+            $yourlsUrls = yourls_urls_array($shortUrls, $productTitle);
+        } else {
+            $yourlsUrls = null;
+        }
 
         // Exibir a página de resultado
-        displayResultPage($processedImagePath, $shortUrls, $bookData['title']);
+        displayResultPage($twig, $processedImagePath, $shortUrls, $productTitle, $yourlsUrls);
     } catch (Exception $e) {
         echo "Erro: " . $e->getMessage();
     }
@@ -76,67 +86,18 @@ function downloadCoverImage($imageUrl)
     return $tempImagePath;
 }
 
-function displayResultPage($imagePath, $shortUrls, $title)
+function displayResultPage($twig, $imagePath, $shortUrls, $title, $yourlsUrls = null)
 {
     $imageUrl = 'img/' . basename($imagePath);
 
-    // Gerar HTML das URLs curtas dentro de uma tabela
-    $urlsHtml = '<table class="affiliate-table">';
-    foreach ($shortUrls as $tag => $url) {
-        $urlsHtml .= <<<HTML
-        <tr>
-            <td class="tag-name">{$tag}</td>
-            <td><input type="text" value="{$url}" id="affiliateUrl-{$tag}" class="affiliate-url" readonly></td>
-            <td><button onclick="copyToClipboard('affiliateUrl-{$tag}')" class="copy-button">
-                <i class="fas fa-clipboard"></i>
-            </button></td>
-        </tr>
-        HTML;
-    }
-    $urlsHtml .= '</table>';
-
-    // HTML final corrigido para seguir seu design atual
-    $html = <<<HTML
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Resultado - Gerador de Capas de Livros</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="style.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    </head>
-    <body>
-        <div class="container">
-            <div class="result-container">
-                <img src="{$imageUrl}" alt="{$title}" class="result-image">
-                <div class="affiliate-links">
-                    {$urlsHtml}
-                </div>
-                <button onclick="window.location.href='index.php'" class="generate-new">Gerar Nova Capa</button>
-            </div>
-        </div>
-        <script>
-        function copyToClipboard(elementId) {
-            var copyText = document.getElementById(elementId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999);
-            document.execCommand("copy");
-
-            var button = copyText.closest("tr").querySelector(".copy-button i");
-            button.className = "fas fa-check";
-            setTimeout(function() {
-                button.className = "fas fa-clipboard";
-            }, 2000);
-        }
-        </script>
-    </body>
-    </html>
-    HTML;
-
-    echo $html;
+    echo $twig->render('result.twig', [
+        'imageUrl' => $imageUrl,
+        'shortUrls' => $shortUrls,
+        'title' => $title,
+        'yourlsUrls' => $yourlsUrls
+    ]);
 }
+
 
 
 

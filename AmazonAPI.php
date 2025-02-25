@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 
+require_once 'vendor/autoload.php';
 use GuzzleHttp\Client;
 
 class AmazonAPI

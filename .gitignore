@@ -7,3 +7,4 @@ upload.sh
 *.cache
 .DS_Store
 Thumbs.db
+baka.*

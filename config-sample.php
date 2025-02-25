@@ -15,3 +15,7 @@ define('AWS_ASSOCIATE_TAGS', json_encode([
     'discord' => 'yourothertag-20',
     'stories' => 'yourothertag-20'
 ]));
+
+// optional: YOURLS integration
+define('YOURLS_API_URL', 'http://yourls.example.com');
+define('YOURLS_TOKEN', '1234567890');

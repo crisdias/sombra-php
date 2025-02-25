@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado - Gerador de Capas de Livros</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="result-container">
+            <img src="{{ imageUrl }}" alt="{{ title }}" class="result-image">
+            <div class="affiliate-links">
+                <table class="affiliate-table">
+                    {% for tag, url in shortUrls %}
+                        <tr>
+                            <td class="tag-name" {% if yourlsUrls is not defined or yourlsUrls[tag] is not defined %}rowspan="1"{% else %}rowspan="2"{% endif %}>{{ tag }}</td>
+                            <td><input type="text" value="{{ url }}" id="affiliateUrl-{{ tag }}" class="affiliate-url" readonly></td>
+                            <td><button onclick="copyToClipboard('affiliateUrl-{{ tag }}')" class="copy-button">
+                                <i class="fas fa-clipboard"></i>
+                            </button></td>
+                        </tr>
+                        {% if yourlsUrls is defined and yourlsUrls[tag] is defined %}
+                        <tr>
+                            <td><input type="text" value="{{ yourlsUrls[tag] }}" id="yourlsUrl-{{ tag }}" class="affiliate-url" readonly></td>
+                            <td><button onclick="copyToClipboard('yourlsUrl-{{ tag }}')" class="copy-button">
+                                <i class="fas fa-clipboard"></i>
+                            </button></td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+            <button onclick="window.location.href='index.php'" class="generate-new">Gerar Nova Capa</button>
+        </div>
+    </div>
+    <script>
+    function copyToClipboard(elementId) {
+        var copyText = document.getElementById(elementId);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+
+        var button = copyText.closest("tr").querySelector(".copy-button i");
+        button.className = "fas fa-check";
+        setTimeout(function() {
+            button.className = "fas fa-clipboard";
+        }, 2000);
+    }
+    </script>
+</body>
+</html>

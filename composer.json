@@ -1,7 +1,8 @@
 {
     "require": {
         "guzzlehttp/guzzle": "^7.0",
-        "intervention/image": "^2.7"
+        "intervention/image": "^2.7",
+        "twig/twig": "^3.20"
     },
     "autoload": {
         "psr-4": {
